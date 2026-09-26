@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Predictor Form | NephroAI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🩺</div>
+      <span>NephroAI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="predict.html" class="nav-link active">Predictor</a></li>
+      <li><a href="results.html" class="nav-link">Results</a></li>
+      <li><a href="records.html" class="nav-link">Records</a></li>
+      <li>
+        <div class="health-badge" id="api-health-badge">
+          <span class="pulse-dot"></span>
+          <span id="api-health-text">Checking API...</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main Predictor Container -->
+  <main class="container">
+
+    <!-- Page Header -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 class="hero-title" style="font-size: 2.5rem;">Patient Diagnostic Staging Form</h1>
+      <p class="hero-subtitle" style="font-size: 1rem; margin-bottom: 0;">
+        Enter 24 clinical parameters or select a sample preset to run Stacked Ensemble AI Prediction.
+      </p>
+    </div>
+
+    <!-- Sample Presets Bar -->
+    <div class="glass-panel preset-bar">
+      <div class="preset-title">
+        <span>🧪 Quick Sample Presets (Auto-Fill 24 Parameters):</span>
+      </div>
+      <div class="preset-buttons">
+        <button type="button" class="btn-preset" onclick="loadPreset('no_ckd')">Normal / No CKD</button>
+        <button type="button" class="btn-preset" onclick="loadPreset('stage2')">Stage 2 (Mild)</button>
+        <button type="button" class="btn-preset" onclick="loadPreset('stage3a')">Stage 3a (Moderate)</button>
+        <button type="button" class="btn-preset" onclick="loadPreset('stage4')">Stage 4 (Severe)</button>
+        <button type="button" class="btn-preset" onclick="loadPreset('stage5')">Stage 5 (Failure)</button>
+      </div>
+    </div>
+
+    <!-- Prediction Form Section -->
+    <section class="glass-panel form-container">
+      <form id="ckd-form" onsubmit="handlePrediction(event)">
+        
+        <!-- Section 0: Patient Identity -->
+        <div class="form-section">
+          <h3 class="form-section-title">👤 Patient Identity</h3>
+          <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="patient_name">Patient Name <span style="color:var(--primary-teal)">*</span></label>
+              <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="Enter patient's full name" required>
+              <div class="invalid-feedback" id="err-patient_name"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Demographics -->
+        <div class="form-section">
+          <h3 class="form-section-title">👤 1. Patient Demographics & Socioeconomic Factors</h3>
+          <div class="form-grid">
+            
+            <div class="form-group">
+              <label class="form-label" for="age">Age <span class="form-unit">(years)</span></label>
+              <input type="number" id="age" name="age" class="form-control" min="18" max="120" placeholder="e.g. 65" required>
+              <div class="invalid-feedback" id="err-age"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gender">Gender</label>
+              <select id="gender" name="gender" class="form-control" required>
+                <option value="">Select Gender</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+              </select>
+              <div class="invalid-feedback" id="err-gender"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ethnicity">Ethnicity</label>
+              <select id="ethnicity" name="ethnicity" class="form-control" required>
+                <option value="">Select Ethnicity</option>
+                <option value="Non-Hispanic White">Non-Hispanic White</option>
+                <option value="Non-Hispanic Black">Non-Hispanic Black</option>
+                <option value="Mexican American">Mexican American</option>
+                <option value="Non-Hispanic Asian">Non-Hispanic Asian</option>
+                <option value="Other Hispanic">Other Hispanic</option>
+                <option value="Other/Multiracial">Other/Multiracial</option>
+              </select>
+              <div class="invalid-feedback" id="err-ethnicity"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="education_level">Education Level</label>
+              <select id="education_level" name="education_level" class="form-control" required>
+                <option value="">Select Level</option>
+                <option value="1">1 - Less than 9th Grade</option>
+                <option value="2">2 - 9-11th Grade</option>
+                <option value="3">3 - High School Grad / GED</option>
+                <option value="4">4 - Some College / AA Degree</option>
+                <option value="5">5 - College Graduate or Higher</option>
+              </select>
+              <div class="invalid-feedback" id="err-education_level"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="poverty_income_ratio">Poverty-Income Ratio <span class="form-unit">(PIR 0.0 - 5.0)</span></label>
+              <input type="number" id="poverty_income_ratio" name="poverty_income_ratio" class="form-control" step="0.01" min="0" max="5" placeholder="e.g. 2.50" required>
+              <div class="invalid-feedback" id="err-poverty_income_ratio"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 2: Body Measurements -->
+        <div class="form-section">
+          <h3 class="form-section-title">⚖️ 2. Body Measurements</h3>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="bmi">Body Mass Index (BMI) <span class="form-unit">(kg/m²)</span></label>
+              <input type="number" id="bmi" name="bmi" class="form-control" step="0.1" min="10" max="80" placeholder="e.g. 28.3" required>
+              <div class="invalid-feedback" id="err-bmi"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="weight_kg">Weight <span class="form-unit">(kg)</span></label>
+              <input type="number" id="weight_kg" name="weight_kg" class="form-control" step="0.1" min="30" max="250" placeholder="e.g. 75.0" required>
+              <div class="invalid-feedback" id="err-weight_kg"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="height_cm">Height <span class="form-unit">(cm)</span></label>
+              <input type="number" id="height_cm" name="height_cm" class="form-control" step="0.1" min="100" max="230" placeholder="e.g. 165.0" required>
+              <div class="invalid-feedback" id="err-height_cm"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3: Vitals -->
+        <div class="form-section">
+          <h3 class="form-section-title">🫀 3. Cardiovascular Vitals</h3>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="bp_systolic">Systolic Blood Pressure <span class="form-unit">(mmHg)</span></label>
+              <input type="number" id="bp_systolic" name="bp_systolic" class="form-control" min="70" max="250" placeholder="e.g. 130" required>
+              <div class="invalid-feedback" id="err-bp_systolic"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bp_diastolic">Diastolic Blood Pressure <span class="form-unit">(mmHg)</span></label>
+              <input type="number" id="bp_diastolic" name="bp_diastolic" class="form-control" min="40" max="150" placeholder="e.g. 80" required>
+              <div class="invalid-feedback" id="err-bp_diastolic"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 4: Laboratory Panels -->
+        <div class="form-section">
+          <h3 class="form-section-title">🧪 4. Laboratory Blood & Urine Panels</h3>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="blood_urea_nitrogen">Blood Urea Nitrogen (BUN) <span class="form-unit">(mg/dL)</span></label>
+              <input type="number" id="blood_urea_nitrogen" name="blood_urea_nitrogen" class="form-control" step="0.1" min="1" max="200" placeholder="e.g. 18.0" required>
+              <div class="invalid-feedback" id="err-blood_urea_nitrogen"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="albumin_serum">Serum Albumin <span class="form-unit">(g/dL)</span></label>
+              <input type="number" id="albumin_serum" name="albumin_serum" class="form-control" step="0.1" min="1" max="7" placeholder="e.g. 4.2" required>
+              <div class="invalid-feedback" id="err-albumin_serum"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phosphorus">Serum Phosphorus <span class="form-unit">(mg/dL)</span></label>
+              <input type="number" id="phosphorus" name="phosphorus" class="form-control" step="0.1" min="1" max="20" placeholder="e.g. 3.6" required>
+              <div class="invalid-feedback" id="err-phosphorus"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bicarbonate">Serum Bicarbonate <span class="form-unit">(mmol/L)</span></label>
+              <input type="number" id="bicarbonate" name="bicarbonate" class="form-control" step="0.1" min="5" max="50" placeholder="e.g. 25.0" required>
+              <div class="invalid-feedback" id="err-bicarbonate"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calcium">Serum Calcium <span class="form-unit">(mg/dL)</span></label>
+              <input type="number" id="calcium" name="calcium" class="form-control" step="0.1" min="4" max="18" placeholder="e.g. 9.4" required>
+              <div class="invalid-feedback" id="err-calcium"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="uric_acid">Serum Uric Acid <span class="form-unit">(mg/dL)</span></label>
+              <input type="number" id="uric_acid" name="uric_acid" class="form-control" step="0.1" min="1" max="25" placeholder="e.g. 5.8" required>
+              <div class="invalid-feedback" id="err-uric_acid"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="urine_creatinine">Urine Creatinine <span class="form-unit">(mg/dL)</span></label>
+              <input type="number" id="urine_creatinine" name="urine_creatinine" class="form-control" step="0.1" min="10" max="600" placeholder="e.g. 115.0" required>
+              <div class="invalid-feedback" id="err-urine_creatinine"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="urine_albumin">Urine Albumin <span class="form-unit">(mg/L)</span></label>
+              <input type="number" id="urine_albumin" name="urine_albumin" class="form-control" step="0.1" min="0" max="5000" placeholder="e.g. 12.5" required>
+              <div class="invalid-feedback" id="err-urine_albumin"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="albumin_creatinine_ratio">Albumin-Creatinine Ratio (ACR) <span class="form-unit">(mg/g)</span></label>
+              <input type="number" id="albumin_creatinine_ratio" name="albumin_creatinine_ratio" class="form-control" step="0.1" min="0" max="5000" placeholder="e.g. 10.8" required>
+              <div class="invalid-feedback" id="err-albumin_creatinine_ratio"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 5: Medical History -->
+        <div class="form-section">
+          <h3 class="form-section-title">📋 5. Medical History & Lifestyle Factors</h3>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="diabetes_diagnosed">Diabetes Diagnosed</label>
+              <select id="diabetes_diagnosed" name="diabetes_diagnosed" class="form-control" required>
+                <option value="2.0">No / Never</option>
+                <option value="1.0">Yes Diagnosed</option>
+                <option value="3.0">Borderline / Pre-diabetes</option>
+              </select>
+              <div class="invalid-feedback" id="err-diabetes_diagnosed"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="insulin_use">Insulin Use</label>
+              <select id="insulin_use" name="insulin_use" class="form-control" required>
+                <option value="2.0">No</option>
+                <option value="1.0">Yes</option>
+              </select>
+              <div class="invalid-feedback" id="err-insulin_use"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="diabetes_pills">Diabetes Medication / Pills</label>
+              <select id="diabetes_pills" name="diabetes_pills" class="form-control" required>
+                <option value="2.0">No</option>
+                <option value="1.0">Yes</option>
+              </select>
+              <div class="invalid-feedback" id="err-diabetes_pills"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ever_smoked">Ever Smoked 100+ Cigarettes</label>
+              <select id="ever_smoked" name="ever_smoked" class="form-control" required>
+                <option value="2.0">No</option>
+                <option value="1.0">Yes</option>
+              </select>
+              <div class="invalid-feedback" id="err-ever_smoked"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="current_smoker">Current Smoking Status</label>
+              <select id="current_smoker" name="current_smoker" class="form-control" required>
+                <option value="3.0">Not at all</option>
+                <option value="1.0">Every day</option>
+                <option value="2.0">Some days</option>
+              </select>
+              <div class="invalid-feedback" id="err-current_smoker"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-primary" id="submit-btn">
+          <span>⚡ Run AI Diagnostic Staging & View Results</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Loading State Overlay -->
+    <div class="glass-panel loading-state" id="loading-state">
+      <div class="spinner"></div>
+      <h3>Analyzing 24 Clinical Parameters...</h3>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">
+        Processing Stacked Ensemble ML Model. Redirecting to Results...
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 NephroAI Clinical CKD Prediction System — Stacked Machine Learning Ensemble</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

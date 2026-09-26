@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NephroAI | Patient Records History</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🩺</div>
+      <span>NephroAI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="predict.html" class="nav-link">Predictor</a></li>
+      <li><a href="results.html" class="nav-link">Results</a></li>
+      <li><a href="records.html" class="nav-link active">Records</a></li>
+      <li>
+        <div class="health-badge" id="api-health-badge">
+          <span class="pulse-dot"></span>
+          <span id="api-health-text">Checking API...</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <!-- Page Header & Filters -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; color: #fff; margin-bottom: 0.5rem;">Patient Records History</h1>
+        <p style="color: var(--text-muted);">View past predictions and clinical details saved in the database.</p>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <input type="text" id="patient-search" class="form-control" placeholder="Search by patient name..." onkeyup="filterRecords()" style="width: 250px;">
+        <select id="stage-filter" class="form-control" style="width: auto;" onchange="filterRecords()">
+          <option value="All">All Stages</option>
+          <option value="No CKD">No CKD</option>
+          <option value="Stage 1 (Kidney Damage)">Stage 1 (Kidney Damage)</option>
+          <option value="Stage 2 (Mildly Decreased)">Stage 2 (Mildly Decreased)</option>
+          <option value="Stage 3a (Mild-Moderate)">Stage 3a (Mild-Moderate)</option>
+          <option value="Stage 3b (Moderate-Severe)">Stage 3b (Moderate-Severe)</option>
+          <option value="Stage 4 (Severely Decreased)">Stage 4 (Severely Decreased)</option>
+          <option value="Stage 5 (Kidney Failure)">Stage 5 (Kidney Failure)</option>
+        </select>
+        <button class="btn-preset" onclick="initRecordsPage()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="records-loading-state" style="display: none; text-align: center; padding: 4rem;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted);">Fetching patient records...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="records-empty-state" class="glass-panel" style="display: none; text-align: center; padding: 4rem;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+      <h3 style="color: #fff; margin-bottom: 1rem;">No records found</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        It looks like there are no predictions matching your criteria, or the database is empty.
+      </p>
+      <a href="predict.html" class="btn-primary" style="display: inline-block;">Make a New Prediction</a>
+    </div>
+
+    <!-- Records List Container -->
+    <div id="records-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+      <!-- Records will be injected here via JavaScript -->
+    </div>
+    
+    <!-- Load More Button -->
+    <div id="load-more-container" style="display: none; text-align: center; margin-bottom: 3rem;">
+        <button class="btn-preset" onclick="loadMoreRecords()" style="width: auto; padding: 0.75rem 2rem;">Load More</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

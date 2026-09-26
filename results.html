@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnostic Results | NephroAI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🩺</div>
+      <span>NephroAI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="predict.html" class="nav-link">New Prediction</a></li>
+      <li><a href="results.html" class="nav-link active">Results</a></li>
+      <li><a href="records.html" class="nav-link">Records</a></li>
+      <li>
+        <div class="health-badge" id="api-health-badge">
+          <span class="pulse-dot"></span>
+          <span id="api-health-text">Checking API...</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main Results Container -->
+  <main class="container">
+
+    <!-- Empty State Container (Displayed if no sessionStorage data) -->
+    <div class="glass-panel" id="no-result-state" style="display: none; text-align: center; padding: 4rem 2rem;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+      <h2 style="font-size: 1.8rem; color: #fff; margin-bottom: 0.75rem;">No Prediction Data Found</h2>
+      <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem auto;">
+        You haven't submitted a patient diagnostic form yet. Please complete the clinical predictor form to generate a diagnostic report.
+      </p>
+      <a href="predict.html" class="btn-primary" style="width: auto; padding: 0.85rem 2rem;">
+        ⚡ Go to Predictor Form
+      </a>
+    </div>
+
+    <!-- Active Results Display Section -->
+    <section id="active-results-section" style="display: none;">
+      
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 class="hero-title" style="font-size: 2.5rem;">Diagnostic Staging Report</h1>
+        <p class="hero-subtitle" style="font-size: 1rem; margin-bottom: 0;">
+          Evaluated via Stacked Machine Learning Ensemble (Random Forest + XGBoost)
+        </p>
+      </div>
+
+      <div class="glass-panel result-card">
+        
+        <h2 id="res-patient-name" style="font-size: 1.8rem; color: #fff; margin-bottom: 1.5rem; text-align: left;">Patient Results</h2>
+
+        <!-- Header: Stage Badge + Confidence -->
+        <div class="result-header">
+          <div>
+            <span style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase;">Predicted CKD Diagnosis</span>
+            <div style="margin-top: 0.5rem;">
+              <span id="res-stage-badge" class="stage-badge-large badge-stage-2">Stage 2 (Mildly Decreased)</span>
+            </div>
+          </div>
+          <div class="confidence-box">
+            <div class="confidence-num" id="res-confidence-num">0.0%</div>
+            <div class="confidence-lbl">Ensemble Confidence</div>
+          </div>
+        </div>
+
+        <!-- 7-Stage Visual Severity Gauge -->
+        <div class="stage-gauge-container">
+          <h4 style="margin-bottom: 0.75rem; color: #fff;">7-Stage CKD Clinical Severity Gauge:</h4>
+          <div class="gauge-track">
+            <div class="gauge-seg gauge-seg-1" id="g-seg-1" title="No CKD"></div>
+            <div class="gauge-seg gauge-seg-2" id="g-seg-2" title="Stage 1"></div>
+            <div class="gauge-seg gauge-seg-3" id="g-seg-3" title="Stage 2"></div>
+            <div class="gauge-seg gauge-seg-4" id="g-seg-4" title="Stage 3a"></div>
+            <div class="gauge-seg gauge-seg-5" id="g-seg-5" title="Stage 3b"></div>
+            <div class="gauge-seg gauge-seg-6" id="g-seg-6" title="Stage 4"></div>
+            <div class="gauge-seg gauge-seg-7" id="g-seg-7" title="Stage 5"></div>
+          </div>
+          <div class="gauge-labels">
+            <span>No CKD</span>
+            <span>Stage 1</span>
+            <span>Stage 2</span>
+            <span>Stage 3a</span>
+            <span>Stage 3b</span>
+            <span>Stage 4</span>
+            <span>Stage 5</span>
+          </div>
+        </div>
+
+        <!-- Clinical Explanation Box -->
+        <div class="explanation-box">
+          <div class="explanation-title">
+            <span>🩺 Clinical Meaning & Actionable Guidance:</span>
+          </div>
+          <p id="res-explanation-text" style="color: var(--text-muted);">
+            Evaluation text will appear here...
+          </p>
+        </div>
+
+        <!-- All-Stage Probability Spectrum -->
+        <div class="prob-spectrum">
+          <h4 style="margin-bottom: 1.25rem; color: #fff;">Probabilities Across All 7 Output Classes:</h4>
+          <div id="prob-rows-container">
+            <!-- Dynamic probability bars inserted here -->
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button type="button" class="btn-primary" onclick="clearAndNewPrediction()" style="width: auto; padding: 0.85rem 2rem;">
+            ⚡ Try Another Prediction
+          </button>
+          <button type="button" class="btn-preset" onclick="window.print()" style="padding: 0.85rem 1.5rem;">
+            🖨️ Print Clinical Report
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 NephroAI Clinical CKD Prediction System — Stacked Machine Learning Ensemble</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

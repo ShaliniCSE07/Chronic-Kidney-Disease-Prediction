@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NephroAI | Patient Health Monitoring & Timeline</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Plotly.js CDN for Longitudinal Trend Visualizations -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🩺</div>
+      <span>NephroAI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="predict.html" class="nav-link">Predictor</a></li>
+      <li><a href="results.html" class="nav-link">Results</a></li>
+      <li><a href="records.html" class="nav-link">Records</a></li>
+      <li>
+        <div class="health-badge" id="api-health-badge">
+          <span class="pulse-dot"></span>
+          <span id="api-health-text">Checking API...</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+
+    <!-- Back Navigation Link -->
+    <div style="margin-bottom: 1.5rem;">
+      <a href="records.html" style="color: var(--primary-cyan); text-decoration: none; font-weight: 500; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+        ← Back to Patient Records History
+      </a>
+    </div>
+
+    <!-- Patient Header -->
+    <div id="patient-header-section" class="glass-panel" style="padding: 1.75rem 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Patient Profile & Health Timeline</div>
+        <h1 id="patient-title-name" style="font-size: 2.2rem; color: #fff; margin-top: 0.2rem;">Loading Patient Details...</h1>
+      </div>
+      <div id="patient-meta-badges" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- Active Health & Deterioration Alert Banners Container -->
+    <div id="patient-alerts-container" style="margin-bottom: 2rem;">
+      <!-- Active alerts injected here -->
+    </div>
+
+    <!-- Loading State -->
+    <div id="patient-loading-state" style="text-align: center; padding: 4rem;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted);">Retrieving longitudinal health records...</p>
+    </div>
+
+    <!-- Patient Not Found / Error State -->
+    <div id="patient-error-state" class="glass-panel" style="display: none; text-align: center; padding: 4rem;">
+      <div style="font-size: 3.5rem; margin-bottom: 1rem;">⚠️</div>
+      <h3 style="color: #fff; margin-bottom: 1rem;" id="error-state-title">Patient Not Found</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;" id="error-state-msg">
+        The requested patient record could not be found or has no recorded clinical predictions.
+      </p>
+      <a href="records.html" class="btn-primary" style="display: inline-block; width: auto; padding: 0.75rem 2rem;">Return to Records</a>
+    </div>
+
+    <!-- Main Content Grid (Charts & Timeline) -->
+    <div id="patient-main-content" style="display: none;">
+      
+      <!-- Plotly Longitudinal Trend Charts Section -->
+      <div style="display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3rem;">
+        
+        <!-- Chart 1: CKD Stage Progression Chart -->
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h3 style="color: #fff; font-size: 1.25rem;">📈 CKD Stage Progression Trend</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem;">Longitudinal severity trend from Stage 0 (No CKD) to Stage 5 (Kidney Failure)</p>
+            </div>
+            <span class="preset-title" style="font-size: 0.8rem;">Step / Line Visualization</span>
+          </div>
+          <div id="stage-trend-chart" style="width: 100%; min-height: 340px;"></div>
+        </div>
+
+        <!-- Chart 2: Key Vitals & Lab Biomarkers Chart -->
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h3 style="color: #fff; font-size: 1.25rem;">🩺 Key Vitals & Lab Biomarkers Over Time</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem;">Tracking Blood Pressure (Systolic/Diastolic) & Blood Urea Nitrogen (BUN) trends</p>
+            </div>
+          </div>
+          <div id="vitals-trend-chart" style="width: 100%; min-height: 360px;"></div>
+        </div>
+
+      </div>
+
+      <!-- Chronological Past Records Section -->
+      <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <h2 style="font-size: 1.5rem; color: #fff;">📋 Chronological Clinical Records History</h2>
+          <span style="color: var(--text-muted); font-size: 0.88rem;">Most recent record at top, oldest at bottom</span>
+        </div>
+
+        <div id="patient-timeline-records" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- Records injected here -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
